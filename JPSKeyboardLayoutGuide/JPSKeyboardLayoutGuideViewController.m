@@ -38,9 +38,8 @@
 
 -(void)_createKeyboardLayoutGuide
 {
-	self.keyboardLayoutGuide = (id<UILayoutSupport>)[UIView new];
-	[(UIView *)self.keyboardLayoutGuide setTranslatesAutoresizingMaskIntoConstraints:NO];
-	[self.view addSubview:(UIView *)self.keyboardLayoutGuide];
+    self.keyboardLayoutGuide = [UILayoutGuide new];
+    [self.view addLayoutGuide:self.keyboardLayoutGuide];
 }
 
 - (void)jps_viewDidLoad {
@@ -61,12 +60,13 @@
 
 - (void)setupKeyboardLayoutGuide {
 	NSAssert(self.keyboardLayoutGuide, @"keyboardLayoutGuide needs to be created by now");
-    // Constraints
-    NSLayoutConstraint *width = [NSLayoutConstraint constraintWithItem:self.keyboardLayoutGuide attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0f constant:0.0f];
-    NSLayoutConstraint *height = [NSLayoutConstraint constraintWithItem:self.keyboardLayoutGuide attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0f constant:0.0f];
-    NSLayoutConstraint *centerX = [NSLayoutConstraint constraintWithItem:self.keyboardLayoutGuide attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeCenterX multiplier:1.0f constant:0.0f];
-    self.bottomConstraint = [NSLayoutConstraint constraintWithItem:self.keyboardLayoutGuide attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeBottom multiplier:1.0f constant:0.0f];
-    [self.view addConstraints:@[width, height, centerX, self.bottomConstraint]];
+
+    self.bottomConstraint = [self.keyboardLayoutGuide.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor];
+
+    [NSLayoutConstraint activateConstraints:@[[self.keyboardLayoutGuide.leftAnchor constraintEqualToAnchor:self.view.leftAnchor],
+                                              [self.keyboardLayoutGuide.rightAnchor constraintEqualToAnchor:self.view.rightAnchor],
+                                              [self.keyboardLayoutGuide.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+                                              self.bottomConstraint]];
 }
 
 #pragma mark - Keyboard Methods

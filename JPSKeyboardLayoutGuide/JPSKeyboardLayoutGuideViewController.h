@@ -14,6 +14,6 @@
 - (void)jps_viewWillAppear:(BOOL)animated;
 - (void)jps_viewDidDisappear:(BOOL)animated;
 
-@property (nonatomic, strong) id<UILayoutSupport> keyboardLayoutGuide;
+@property (nonatomic, strong) UILayoutGuide *keyboardLayoutGuide;
 
 @end
