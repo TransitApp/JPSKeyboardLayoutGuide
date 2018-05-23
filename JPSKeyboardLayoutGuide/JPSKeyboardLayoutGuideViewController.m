@@ -83,6 +83,8 @@
 }
 
 - (void)keyboardWillShow:(NSNotification *)notification {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+
     NSDictionary *info = notification.userInfo;
     NSValue *kbFrame = info[UIKeyboardFrameEndUserInfoKey];
     NSTimeInterval animationDuration = [info[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
@@ -99,12 +101,17 @@
 }
 
 - (void)keyboardWillHide:(NSNotification *)notification {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [self performSelector:@selector(hideKeyboardWithNotification:) withObject:notification afterDelay:0.01];
+}
+
+- (void)hideKeyboardWithNotification:(NSNotification *)notification {
     NSDictionary *info = notification.userInfo;
     NSTimeInterval animationDuration = [info[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
     UIViewAnimationCurve curve = [info[UIKeyboardAnimationCurveUserInfoKey] integerValue];
-    
+
     self.bottomConstraint.constant = 0;
-    
+
     [UIView beginAnimations:nil context:nil];
     [UIView setAnimationDuration:animationDuration];
     [UIView setAnimationCurve:curve];
