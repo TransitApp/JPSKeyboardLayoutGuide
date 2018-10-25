@@ -52,7 +52,7 @@
 }
 
 - (void)jps_viewDidDisappear:(BOOL)animated {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillChangeFrameNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardDidChangeFrameNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
 }
 
@@ -73,8 +73,8 @@
 
 - (void)observeKeyboard {
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(keyboardWillShow:)
-                                                 name:UIKeyboardWillChangeFrameNotification
+                                             selector:@selector(keyboardDidShow:)
+                                                 name:UIKeyboardDidChangeFrameNotification
                                                object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWillHide:)
@@ -82,41 +82,47 @@
                                                object:nil];
 }
 
-- (void)keyboardWillShow:(NSNotification *)notification {
+- (void)keyboardDidShow:(NSNotification *)notification {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
 
     NSDictionary *info = notification.userInfo;
     NSValue *kbFrame = info[UIKeyboardFrameEndUserInfoKey];
     NSTimeInterval animationDuration = [info[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
-    UIViewAnimationCurve curve = [info[UIKeyboardAnimationCurveUserInfoKey] integerValue];
+    UIViewAnimatingState curve = [info[UIKeyboardAnimationCurveUserInfoKey] integerValue];
     CGRect keyboardFrame = kbFrame.CGRectValue;
 
-    self.bottomConstraint.constant = -keyboardFrame.size.height;
-    
-    [UIView beginAnimations:nil context:nil];
-    [UIView setAnimationDuration:animationDuration];
-    [UIView setAnimationCurve:curve];
-    [self.view layoutIfNeeded];
-    [UIView commitAnimations];
+    self.bottomConstraint.constant = -(self.view.bounds.size.height - CGRectGetMinY(keyboardFrame));
+
+    [UIViewPropertyAnimator runningPropertyAnimatorWithDuration:animationDuration
+                                                          delay:0
+                                                        options:(UIViewAnimationOptions)curve << 16 | UIViewAnimationOptionBeginFromCurrentState
+                                                     animations:^{}
+                                                     completion:^(UIViewAnimatingPosition finalPosition) {
+                                                         [self.view layoutIfNeeded];
+                                                     }];
 }
 
 - (void)keyboardWillHide:(NSNotification *)notification {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    [self performSelector:@selector(hideKeyboardWithNotification:) withObject:notification afterDelay:0.01];
-}
-
-- (void)hideKeyboardWithNotification:(NSNotification *)notification {
     NSDictionary *info = notification.userInfo;
     NSTimeInterval animationDuration = [info[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
     UIViewAnimationCurve curve = [info[UIKeyboardAnimationCurveUserInfoKey] integerValue];
 
     self.bottomConstraint.constant = 0;
 
-    [UIView beginAnimations:nil context:nil];
-    [UIView setAnimationDuration:animationDuration];
-    [UIView setAnimationCurve:curve];
-    [self.view layoutIfNeeded];
-    [UIView commitAnimations];
+    [UIView performWithoutAnimation:^{
+        self.view.backgroundColor = [UIColor colorWithWhite:0.95 alpha:0.9];
+    }];
+
+    [UIViewPropertyAnimator runningPropertyAnimatorWithDuration:animationDuration
+                                                          delay:0
+                                                        options:(UIViewAnimationOptions)curve << 16 | UIViewAnimationOptionBeginFromCurrentState
+                                                     animations:^{
+                                                         [self.view layoutIfNeeded];
+                                                     }
+                                                     completion:^(UIViewAnimatingPosition finalPosition) {
+                                                         self.view.backgroundColor = UIColor.clearColor;
+
+                                                     }];
 }
 
 @end
