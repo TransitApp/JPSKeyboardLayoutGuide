@@ -111,14 +111,13 @@
 
     [UIView performWithoutAnimation:^{
         self.view.backgroundColor = [UIColor colorWithWhite:0.95 alpha:0.9];
+        [self.view layoutIfNeeded];
     }];
 
     [UIViewPropertyAnimator runningPropertyAnimatorWithDuration:animationDuration
                                                           delay:0
                                                         options:(UIViewAnimationOptions)curve << 16 | UIViewAnimationOptionBeginFromCurrentState
-                                                     animations:^{
-                                                         [self.view layoutIfNeeded];
-                                                     }
+                                                     animations:^{}
                                                      completion:^(UIViewAnimatingPosition finalPosition) {
                                                          self.view.backgroundColor = UIColor.clearColor;
 
