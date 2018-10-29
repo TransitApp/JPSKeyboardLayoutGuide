@@ -54,6 +54,7 @@
 - (void)jps_viewDidDisappear:(BOOL)animated {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardDidChangeFrameNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardDidHideNotification object:nil];
 }
 
 #pragma mark - Keyboard Layout Guide
@@ -80,6 +81,10 @@
                                              selector:@selector(keyboardWillHide:)
                                                  name:UIKeyboardWillHideNotification
                                                object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardDidHide:)
+                                                 name:UIKeyboardDidHideNotification
+                                               object:nil];
 }
 
 - (void)keyboardDidShow:(NSNotification *)notification {
@@ -103,25 +108,16 @@
 }
 
 - (void)keyboardWillHide:(NSNotification *)notification {
-    NSDictionary *info = notification.userInfo;
-    NSTimeInterval animationDuration = [info[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
-    UIViewAnimationCurve curve = [info[UIKeyboardAnimationCurveUserInfoKey] integerValue];
-
     self.bottomConstraint.constant = 0;
 
     [UIView performWithoutAnimation:^{
         self.view.backgroundColor = [UIColor colorWithWhite:0.95 alpha:0.9];
         [self.view layoutIfNeeded];
     }];
+}
 
-    [UIViewPropertyAnimator runningPropertyAnimatorWithDuration:animationDuration
-                                                          delay:0
-                                                        options:(UIViewAnimationOptions)curve << 16 | UIViewAnimationOptionBeginFromCurrentState
-                                                     animations:^{}
-                                                     completion:^(UIViewAnimatingPosition finalPosition) {
-                                                         self.view.backgroundColor = UIColor.clearColor;
-
-                                                     }];
+- (void)keyboardDidHide:(NSNotification *)notification {
+    self.view.backgroundColor = UIColor.clearColor;
 }
 
 @end
