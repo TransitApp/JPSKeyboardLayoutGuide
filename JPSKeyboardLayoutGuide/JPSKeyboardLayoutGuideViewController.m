@@ -73,16 +73,16 @@
 
 - (void)observeKeyboard {
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(keyboardDidShow:)
+                                             selector:@selector(jps_keyboardDidShow:)
                                                  name:UIKeyboardDidChangeFrameNotification
                                                object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(keyboardWillHide:)
+                                             selector:@selector(jps_keyboardWillHide:)
                                                  name:UIKeyboardWillHideNotification
                                                object:nil];
 }
 
-- (void)keyboardDidShow:(NSNotification *)notification {
+- (void)jps_keyboardDidShow:(NSNotification *)notification {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
 
     NSDictionary *info = notification.userInfo;
@@ -102,7 +102,7 @@
                                                      }];
 }
 
-- (void)keyboardWillHide:(NSNotification *)notification {
+- (void)jps_keyboardWillHide:(NSNotification *)notification {
     self.bottomConstraint.constant = 0;
 }
 
