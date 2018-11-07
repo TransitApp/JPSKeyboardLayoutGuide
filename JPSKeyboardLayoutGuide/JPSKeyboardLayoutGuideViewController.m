@@ -88,18 +88,27 @@
     NSDictionary *info = notification.userInfo;
     NSValue *kbFrame = info[UIKeyboardFrameEndUserInfoKey];
     NSTimeInterval animationDuration = [info[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
-    UIViewAnimatingState curve = [info[UIKeyboardAnimationCurveUserInfoKey] integerValue];
+    UIViewAnimationCurve curve = [info[UIKeyboardAnimationCurveUserInfoKey] integerValue];
     CGRect keyboardFrame = kbFrame.CGRectValue;
 
     self.bottomConstraint.constant = -(self.view.bounds.size.height - CGRectGetMinY(keyboardFrame));
 
-    [UIViewPropertyAnimator runningPropertyAnimatorWithDuration:animationDuration
-                                                          delay:0
-                                                        options:(UIViewAnimationOptions)curve << 16 | UIViewAnimationOptionBeginFromCurrentState
-                                                     animations:^{}
-                                                     completion:^(UIViewAnimatingPosition finalPosition) {
-                                                         [self.view layoutIfNeeded];
-                                                     }];
+    if (@available(iOS 11.0, *)) {
+        [UIViewPropertyAnimator runningPropertyAnimatorWithDuration:animationDuration
+                                                              delay:0
+                                                            options:(UIViewAnimationOptions)curve << 16 | UIViewAnimationOptionBeginFromCurrentState
+                                                         animations:^{}
+                                                         completion:^(UIViewAnimatingPosition finalPosition) {
+                                                             [self.view layoutIfNeeded];
+                                                         }];
+    }
+    else {
+        [UIView beginAnimations:nil context:nil];
+        [UIView setAnimationDuration:animationDuration];
+        [UIView setAnimationCurve:curve];
+        [self.view layoutIfNeeded];
+        [UIView commitAnimations];
+    }
 }
 
 - (void)jps_keyboardWillHide:(NSNotification *)notification {
