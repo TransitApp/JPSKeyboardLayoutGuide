@@ -52,7 +52,7 @@
 }
 
 - (void)jps_viewDidDisappear:(BOOL)animated {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardDidChangeFrameNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillChangeFrameNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
 }
 
@@ -74,7 +74,7 @@
 - (void)observeKeyboard {
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(jps_keyboardDidShow:)
-                                                 name:UIKeyboardDidChangeFrameNotification
+                                                 name:UIKeyboardWillChangeFrameNotification
                                                object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(jps_keyboardWillHide:)
@@ -93,22 +93,11 @@
 
     self.bottomConstraint.constant = -(self.view.bounds.size.height - CGRectGetMinY(keyboardFrame));
 
-    if (@available(iOS 11.0, *)) {
-        [UIViewPropertyAnimator runningPropertyAnimatorWithDuration:animationDuration
-                                                              delay:0
-                                                            options:(UIViewAnimationOptions)curve << 16 | UIViewAnimationOptionBeginFromCurrentState
-                                                         animations:^{}
-                                                         completion:^(UIViewAnimatingPosition finalPosition) {
-                                                             [self.view layoutIfNeeded];
-                                                         }];
-    }
-    else {
-        [UIView beginAnimations:nil context:nil];
-        [UIView setAnimationDuration:animationDuration];
-        [UIView setAnimationCurve:curve];
-        [self.view layoutIfNeeded];
-        [UIView commitAnimations];
-    }
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:animationDuration];
+    [UIView setAnimationCurve:curve];
+    [self.view layoutIfNeeded];
+    [UIView commitAnimations];
 }
 
 - (void)jps_keyboardWillHide:(NSNotification *)notification {
