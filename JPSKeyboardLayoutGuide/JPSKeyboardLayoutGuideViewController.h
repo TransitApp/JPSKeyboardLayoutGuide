@@ -14,6 +14,9 @@
 - (void)jps_viewWillAppear:(BOOL)animated;
 - (void)jps_viewDidDisappear:(BOOL)animated;
 
+- (void)jps_keyboardDidShow:(NSNotification *)notification;
+- (void)jps_keyboardWillHide:(NSNotification *)notification;
+
 @property (nonatomic, strong) UILayoutGuide *keyboardLayoutGuide;
 
 @end
